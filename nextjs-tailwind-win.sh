@@ -27,6 +27,11 @@ npx create-next-app@latest "${Project_Name}-client" \
 
 cd "${Project_Name}-client"
 
+if [ -d .git ]
+then
+    rm -rf .git
+fi
+
 # Preferred Plugins 
 npm install -D \
     prettier \
@@ -75,6 +80,10 @@ export default function NavBar() {
     return <ul></ul>
 }
 EOF
+
+# Setup Login
+
+# Setup Auth
 
 # Setup TanStackQuery
 cat > src/app/providers.tsx << 'EOF'
