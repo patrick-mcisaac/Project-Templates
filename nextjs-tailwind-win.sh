@@ -76,12 +76,128 @@ mkdir -p "src/app/(auth)" \
 
 # Setup NavBar
 cat > src/components/nav/NavBar.tsx << 'EOF'
+"use client"
+import { useState } from "react"
+import HamburgerToggle from "./HamburgerToggle"
+import NavItems from "./NavItems"
+
 export default function NavBar() {
-    return <ul></ul>
+    const [isVisible, setIsVisible] = useState(false)
+    return (
+        <>
+            <NavItems
+                ulClass="md:flex h-25 gap-10 pl-10 justify-start text-5xl flex-row hidden"
+                linkClass=""
+                setIsVisible={setIsVisible}
+            />
+
+            {/* Mobile Nav */}
+            {isVisible ?
+                <NavItems
+                    ulClass={`md:hidden h-fit w-100 flex-col`}
+                    linkClass="flex h-15 w-full  items-center justify-center"
+                    setIsVisible={setIsVisible}
+                />
+            :   <HamburgerToggle
+                    className={`text-4xl md:hidden`}
+                    setIsVisible={setIsVisible}
+                />
+            }
+        </>
+    )
 }
 EOF
 
+cat > src/components/nav/NavItems.tsx << 'EOF'
+"use client"
+import { faX } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Link from "next/link"
+import { Dispatch, SetStateAction } from "react"
+
+type NavItemProps = {
+    ulClass: string
+    linkClass: string
+    setIsVisible: Dispatch<SetStateAction<boolean>>
+}
+
+export default function NavItems({
+    ulClass,
+    linkClass,
+    setIsVisible
+}: NavItemProps) {
+    return (
+        <ul className={`${ulClass} nav tracking-widest md:flex-row`}>
+            {localStorage.getItem("Project_Name") ?
+                <>
+                    <Link
+                        onClick={() => setIsVisible(false)}
+                        className={`${linkClass}`}
+                        href={"/"}
+                    >
+                        <li>Home</li>
+                    </Link>
+                    <Link
+                        className={`${linkClass} md:mr-10 md:ml-auto`}
+                        href={"/"}
+                        onClick={() => {
+                            localStorage.removeItem("Project_Name")
+                            setIsVisible(false)
+                        }}
+                    >
+                        <li>Logout</li>
+                    </Link>
+                    {/* Use same height as Link */}
+                    <li
+                        onClick={() => setIsVisible(false)}
+                        className="flex h-15 w-screen items-center justify-center hover:cursor-pointer md:hidden"
+                    >
+                        <FontAwesomeIcon icon={faX} />
+                    </li>
+                </>
+            :   <Link
+                    onClick={() => setIsVisible(false)}
+                    className={`${linkClass}`}
+                    href={"/login"}
+                >
+                    <li>Login</li>
+                </Link>
+            }
+        </ul>
+    )
+}
+EOF
+
+cat > src/components/nav/HamburgerToggle.tsx << 'EOF'
+"use client"
+import { faBars } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Dispatch, SetStateAction } from "react"
+
+type NavItemProps = {
+    className: string
+    setIsVisible: Dispatch<SetStateAction<boolean>>
+}
+
+export default function HamburgerToggle({
+    className,
+    setIsVisible
+}: NavItemProps) {
+    return (
+        <div className={`${className} mr-5 ml-auto flex h-20 items-center`}>
+            <button onClick={() => setIsVisible(true)}>
+                <FontAwesomeIcon icon={faBars} />
+            </button>
+        </div>
+    )
+}
+
+EOF
+
+
 # Setup Login
+
+# Setup Register
 
 # Setup Auth
 
@@ -104,6 +220,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     )
 }
 EOF
+
+# Layout
 
 cat > src/app/layout.tsx << 'EOF'
 import type { Metadata } from "next"
@@ -142,6 +260,47 @@ export default function RootLayout({
             </body>
         </html>
     )
+}
+EOF
+
+
+# CSS
+cat > src/app/globals.css << 'EOF'
+@import "tailwindcss";
+
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
+}
+
+@layer components {
+    .nav {
+        display: flex;
+        align-items: center;
+        font-size: 1.8rem;
+        font-weight: bold;
+        width: 100%;
+    }
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
 }
 EOF
 
