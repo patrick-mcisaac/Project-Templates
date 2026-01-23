@@ -84,7 +84,7 @@ import NavItems from "./NavItems"
 export default function NavBar() {
     const [isVisible, setIsVisible] = useState(false)
     return (
-        <>
+        <nav className="absolute w-screen">
             <NavItems
                 ulClass="md:flex h-25 gap-10 pl-10 justify-start text-5xl flex-row hidden"
                 linkClass=""
@@ -103,9 +103,10 @@ export default function NavBar() {
                     setIsVisible={setIsVisible}
                 />
             }
-        </>
+        </nav>
     )
 }
+
 EOF
 
 cat > src/components/nav/NavItems.tsx << 'EOF'
@@ -139,7 +140,7 @@ export default function NavItems({
                     </Link>
                     <Link
                         className={`${linkClass} md:mr-10 md:ml-auto`}
-                        href={"/"}
+                        href={"/login"}
                         onClick={() => {
                             localStorage.removeItem("Project_Name")
                             setIsVisible(false)
@@ -166,7 +167,10 @@ export default function NavItems({
         </ul>
     )
 }
+
 EOF
+
+# Mobile Hamburger Menu
 
 cat > src/components/nav/HamburgerToggle.tsx << 'EOF'
 "use client"
@@ -184,18 +188,102 @@ export default function HamburgerToggle({
     setIsVisible
 }: NavItemProps) {
     return (
-        <div className={`${className} mr-5 ml-auto flex h-20 items-center`}>
+        <div className={`${className} mr-3 flex h-15 items-center justify-end`}>
             <button onClick={() => setIsVisible(true)}>
                 <FontAwesomeIcon icon={faBars} />
             </button>
         </div>
     )
 }
-
 EOF
 
+# Setup Form Components
+cat > src/components/forms/Button.tsx << 'EOF'
+import React from "react"
+type ButtonProps = {
+    className: string
+    onClick: React.MouseEventHandler<HTMLButtonElement>
+}
+export default function Button({ className, onClick }: ButtonProps) {
+    return (
+        <button
+            className={`${className} button racking-wider cursor-pointer tracking-widest transition hover:scale-110 md:w-50 md:text-xl md:font-semibold`}
+            onClick={onClick}
+        >
+            Login
+        </button>
+    )
+}
+EOF
+
+cat > src/components/forms/Input.tsx << 'EOF'
+import React from "react"
+type InputProps = {
+    type: string
+    className: string
+    label: string
+    id: string
+    onChange: React.ChangeEventHandler<HTMLInputElement>
+    value: string
+}
+export default function Input({
+    type,
+    className,
+    label,
+    id,
+    onChange,
+    value
+}: InputProps) {
+    return (
+        <fieldset className="flex flex-col gap-2 tracking-widest">
+            <label htmlFor={id} className="pl-2">
+                {label}
+            </label>
+            <input
+                id={id}
+                type={type}
+                className={`${className} bg-midground rounded-2xl p-1 pl-3 text-xl md:w-100`}
+                placeholder={label}
+                onChange={onChange}
+                value={value}
+            />
+        </fieldset>
+    )
+}
+EOF
 
 # Setup Login
+cat > "src/(auth)/login/page.tsx" << 'EOF'
+"use client"
+import Button from "@/components/forms/Button"
+import Input from "@/components/forms/Input"
+
+export default function Login() {
+    return (
+        <form className="-mt-10 flex h-screen flex-col items-center justify-center gap-15">
+            <Input
+                label="username"
+                id="username"
+                value=""
+                onChange={() => {}}
+                type="text"
+                className=""
+            />
+
+            <Input
+                label="password"
+                id="password"
+                value=""
+                onChange={() => {}}
+                type="password"
+                className=""
+            />
+
+            <Button onClick={() => {}} className="" />
+        </form>
+    )
+}
+EOF
 
 # Setup Register
 
@@ -253,7 +341,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen justify-center antialiased`}
+                className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col justify-start antialiased`}
             >
                 <NavBar />
                 <Providers>{children}</Providers>
@@ -261,6 +349,7 @@ export default function RootLayout({
         </html>
     )
 }
+
 EOF
 
 
@@ -271,11 +360,13 @@ cat > src/app/globals.css << 'EOF'
 :root {
     --background: #ffffff;
     --foreground: #171717;
+    --midground: #3a3939;
 }
 
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
+    --color-midground: var(--midground);
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
 }
@@ -284,6 +375,7 @@ cat > src/app/globals.css << 'EOF'
     :root {
         --background: #0a0a0a;
         --foreground: #ededed;
+        --midground: #242424;
     }
 }
 
@@ -295,6 +387,14 @@ cat > src/app/globals.css << 'EOF'
         font-weight: bold;
         width: 100%;
     }
+
+    .button {
+        background-color: var(--midground);
+        width: 7rem;
+        height: 2.5rem;
+        border-radius: 1rem;
+        text-align: center;
+    }
 }
 
 body {
@@ -302,6 +402,7 @@ body {
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
 }
+
 EOF
 
 
