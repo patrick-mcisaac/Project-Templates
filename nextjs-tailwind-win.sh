@@ -67,6 +67,7 @@ mkdir -p "src/app/(auth)" \
     "src/app/(auth)/register" \
     src/components \
     src/components/nav \
+    src/components/forms \
     src/types \
     src/data \
     src/hooks \
@@ -253,7 +254,7 @@ export default function Input({
 EOF
 
 # Setup Login
-cat > "src/(auth)/login/page.tsx" << 'EOF'
+cat > "src/app/(auth)/login/page.tsx" << 'EOF'
 "use client"
 import Button from "@/components/forms/Button"
 import Input from "@/components/forms/Input"
